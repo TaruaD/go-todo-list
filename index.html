@@ -20,12 +20,14 @@
             min-height: 100vh;
             padding-top: 50px;
         }
-        .todo-container{
+
+        .todo-container {
             width: 100%;
             max-width: 500px;
             text-align: center;
             margin: 0 auto;
         }
+
         button {
             cursor: pointer;
             width: 100px;
@@ -35,11 +37,12 @@
             color: #FFF6F6;
             border: 1px solid #dee2e6;
             transition: all 0.3s ease-in-out;
-            box-shadow: 4px 2px 3px rgba(0,0,0,0.1);
-            &:hover{
+            box-shadow: 4px 2px 3px rgba(0, 0, 0, 0.1);
+
+            &:hover {
                 background: #dee2e6;
                 background-color: #ced4da;
-                box-shadow: 4px 4px 6px rgba(0,0,0,0.1);
+                box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.1);
                 transform: translateY(-2px);
             }
         }
@@ -65,7 +68,8 @@
             list-style: none;
             margin: 20px 0;
         }
-        .todo-list li{
+
+        .todo-list li {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -73,20 +77,23 @@
             padding: 10px;
             margin-bottom: 10px;
             background: #6c757d;
-            color:white;
+            color: white;
 
             border-radius: 10px;
             background: #6c757d;
         }
-        .task-text{
+
+        .task-text {
             flex: 1;
             margin-right: 10px;
             word-break: break-all;
         }
+
         h1 {
             text-align: center;
         }
-        .clear-btn{
+
+        .clear-btn {
             background: #dc3545;
             width: auto;
             padding: 5px;
@@ -108,36 +115,7 @@
         <ul class="todo-list" id="todo-list"></ul>
 
     </div>
-    <script>
-        const todoinput = document.getElementById("todo-input")
-        const todolist = document.getElementById("todo-list")
-
-        todoinput.addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-                addTodo()
-            }
-        })
-        function addTodo() {
-            const task = todoinput.value.trim();
-            if (task === '') return
-            const li = document.createElement("li")
-            li.innerText = task
-            li.innerHTML = `
-        <span class="task-text">${task}</span>
-        <button class="del-btn" onclick="deleteTask(this)">删除</button>`
-
-            todolist.appendChild(li)
-            todoinput.value = ''
-        }
-        function clearAll() {
-            todolist.innerHTML = ''
-        }
-        function deleteTask(btn) {
-            const li = btn.parentElement;
-            li.remove()
-        }
-
-    </script>
+    <script src="main.js"></script>
 </body>
 
 </html>
