@@ -22,6 +22,7 @@ func enableCORS(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 func main() {
+	db.Init()
 	//createHandler
 	http.HandleFunc("/create", enableCORS(createHandler))
 	//deleteHandler
@@ -54,15 +55,25 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 		Name:      name,
 		Completed: false,
 	}
-	db.Todos = append(db.Todos, newTodo)
-	log.Println("todos:", db.Todos)
+	err = db.CreateTodo(newTodo)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 func getAllHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(db.Todos)
-	log.Println("handlegetall:", db.Todos)
+	todos, err := db.GetAllTodos()
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(todos)
+
 }
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	params := map[string]string{}
@@ -73,11 +84,11 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := params["id"]
-	for i, todo := range db.Todos {
-		if todo.ID == id {
-			db.Todos = append(db.Todos[:i], db.Todos[i+1:]...)
-			break
-		}
+	db.DeleteTodo(id)
+	if err = db.DeleteTodo(id); err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
