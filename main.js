@@ -34,8 +34,8 @@ async function fetchTodos() {
 function renderTodo(todo) {
     const li = document.createElement("li");
     li.innerHTML = `
-        <span class="task-text">${todo.Name}</span>
-        <button class="del-btn" onclick="deleteTask('${todo.ID}')">删除</button>
+        <span class="task-text">${todo.name}</span>
+        <button class="del-btn" onclick="deleteTask('${todo.id}')">删除</button>
     `;
     todoList.appendChild(li);
 }

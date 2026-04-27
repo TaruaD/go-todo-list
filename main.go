@@ -76,6 +76,10 @@ func getAllHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "仅支持 POST 请求", http.StatusMethodNotAllowed)
+		return
+	}
 	params := map[string]string{}
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
@@ -84,7 +88,6 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := params["id"]
-	db.DeleteTodo(id)
 	if err = db.DeleteTodo(id); err != nil {
 		log.Fatal(err)
 		w.WriteHeader(http.StatusInternalServerError)
