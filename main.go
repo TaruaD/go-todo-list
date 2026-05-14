@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"tod/db"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -23,6 +24,9 @@ func enableCORS(next http.HandlerFunc) http.HandlerFunc {
 }
 func main() {
 	db.Init()
+	router := gin.Default()
+	router.LoadHTMLFiles("templates/index.html")
+
 	//createHandler
 	http.HandleFunc("/create", enableCORS(createHandler))
 	//deleteHandler
