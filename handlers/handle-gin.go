@@ -1,10 +1,6 @@
 package handlers
 
-import (
-	"tod/models"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gin-gonic/gin"
 
 func GetTodo(c *gin.Context) {
 	c.JSON(200, gin.H{
@@ -13,7 +9,7 @@ func GetTodo(c *gin.Context) {
 	})
 }
 func CreateTodo(c *gin.Context) {
-	var newTodo models.Todo
+	var newTodo Todo
 	if err := c.ShouldBindJSON(&newTodo); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
