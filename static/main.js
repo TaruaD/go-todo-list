@@ -13,12 +13,13 @@ Input.addEventListener("keypress", (e) => {
 
 async function fetchTodos() {
     try {
+
         const resp = await fetch(`${API_URL}/todo`)
         const todos = await resp.json()
         ListEL.innerHTML = ''
         todos.forEach(todo=>{
-            const li = createTodo(todo)
-            ListEL.appendChild(li)
+                const li = createTodo(todo)
+                ListEL.appendChild(li)
             }
         )
     } catch (error) {
@@ -40,7 +41,7 @@ async function addTodo() {
         const data = await resp.json()
         Input.value = ''
         Input.focus()
-         await fetchTodos()
+        await fetchTodos()
     } catch (error) {
         console.log("错误", error)
     }
@@ -52,34 +53,28 @@ async function deleteTodo(id){
         })
         if (resp.ok) {
             await fetchTodos()
-            }
+        }
 
     }catch(err){
         console.log(err)
     }
 }
 function createTodo(todo) {
+    const span = document.createElement("span")
+    const meta = document.createElement("small");
+    span.textContent=todo.title
+    meta.className = "todo-meta";
     const li=document.createElement("li");
     li.className="todo-item"
     if (todo.status === "done") {
         li.classList.add("done")
     }
-   const span = document.createElement("span");
-    span.className = "task-text";
-    span.textContent = todo.title;
-    span.title = "点击切换完成/未完成";
-    span.addEventListener("click", () => toggleTodoStatus(todo));
-
-    const meta = document.createElement("span");
-    meta.className = "task-status";
-
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.className = "del-btn";
     delBtn.textContent = "删除";
     delBtn.addEventListener("click", ()=>
         deleteTodo(todo.id))
-
     li.appendChild(meta);
     li.appendChild(span);
     li.appendChild(delBtn);

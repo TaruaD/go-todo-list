@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -36,12 +37,14 @@ func main() {
 	}
 	fmt.Println("连接数据库成功")
 	r := gin.Default()
+	r.Use(cors.Default())
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./static")
 	r.GET("/index", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
 	})
 	V1Group := r.Group("/v1")
+	V1Group.Use(cors.Default())
 	{
 		//添加
 		V1Group.POST("/todo", func(c *gin.Context) {
@@ -95,6 +98,6 @@ func main() {
 			}
 		})
 	}
-	r.Run(":8081")
+	r.Run(":8080")
 
 }
