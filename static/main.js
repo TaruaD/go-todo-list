@@ -1,90 +1,89 @@
-const todoInput = document.getElementById("todo-input");
-const todoList = document.getElementById("todo-list");
-const API_URL = "http://localhost:8080";
+const API_URL = "/v1"
+const DEFAULT_STATUS = "pending"
+const Input = document.getElementById("todo-input");
+const ListEL = document.getElementById("todo-list");
+const clearBtn = document.querySelector(".clear-btn");
+clearBtn.style.display='none'
 
-// 1. 页面初始化：获取已有数据
-document.addEventListener("DOMContentLoaded", fetchTodos);
-
-// 监听回车键添加
-todoInput.addEventListener("keypress", function (e) {
+Input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
-        addTodo();
+        addTodo()
     }
-});
+})
 
-// 获取所有待办事项
 async function fetchTodos() {
     try {
-        const response = await fetch(`${API_URL}/GetAll`);
-        const todos = await response.json();
-
-        // 清空当前列表并重新渲染
-        todoList.innerHTML = '';
-        if (todos) {
-            todos.forEach(todo => {
-                renderTodo(todo);
-            });
-        }
+        const resp = await fetch(`${API_URL}/todo`)
+        const todos = await resp.json()
+        ListEL.innerHTML = ''
+        todos.forEach(todo=>{
+            const li = createTodo(todo)
+            ListEL.appendChild(li)
+            }
+        )
     } catch (error) {
-        console.error("获取数据失败:", error);
+        console.log("加载失败", error)
     }
 }
-
-// 渲染单个任务到页面
-function renderTodo(todo) {
-    const li = document.createElement("li");
-    li.innerHTML = `
-        <span class="task-text">${todo.name}</span>
-        <button class="del-btn" onclick="deleteTask('${todo.id}')">删除</button>
-    `;
-    todoList.appendChild(li);
-}
-
-// 2. 添加任务
 async function addTodo() {
-    const taskName = todoInput.value.trim();
-    if (taskName === '') return;
-
+    const title = Input.value.trim()
+    if (title === "") {return}
     try {
-        const response = await fetch(`${API_URL}/create`, {
+        const resp = await fetch(`${API_URL}/todo`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name: taskName })
-        });
-
-        if (response.ok) {
-            todoInput.value = ''; // 清空输入框
-            fetchTodos();        // 重新拉取列表以同步后端
-        }
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title: title,
+                status: DEFAULT_STATUS
+            }),
+        })
+        const data = await resp.json()
+        Input.value = ''
+        Input.focus()
+         await fetchTodos()
     } catch (error) {
-        console.error("添加失败:", error);
+        console.log("错误", error)
     }
 }
-
-// 3. 删除任务
-async function deleteTask(id) {
+async function deleteTodo(id){
     try {
-        const response = await fetch(`${API_URL}/Delete`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: id })
-        });
+        const resp=await fetch(`${API_URL}/todo/${id}`,{
+            method: "DELETE"
+        })
+        if (resp.ok) {
+            await fetchTodos()
+            }
 
-        if (response.ok) {
-            fetchTodos(); // 删除成功后刷新列表
-        }
-    } catch (error) {
-        console.error("删除失败:", error);
+    }catch(err){
+        console.log(err)
     }
 }
-
-// 清空所有（前端演示，建议后端也增加对应的接口）
-function clearAll() {
-    if (confirm("确定要清空前端显示吗？(后端数据需配合接口)")) {
-        todoList.innerHTML = '';
+function createTodo(todo) {
+    const li=document.createElement("li");
+    li.className="todo-item"
+    if (todo.status === "done") {
+        li.classList.add("done")
     }
+   const span = document.createElement("span");
+    span.className = "task-text";
+    span.textContent = todo.title;
+    span.title = "点击切换完成/未完成";
+    span.addEventListener("click", () => toggleTodoStatus(todo));
+
+    const meta = document.createElement("span");
+    meta.className = "task-status";
+
+    const delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.className = "del-btn";
+    delBtn.textContent = "删除";
+    delBtn.addEventListener("click", ()=>
+        deleteTodo(todo.id))
+
+    li.appendChild(meta);
+    li.appendChild(span);
+    li.appendChild(delBtn);
+    return li;
+
 }
+fetchTodos()
