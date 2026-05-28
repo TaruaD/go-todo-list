@@ -3,7 +3,6 @@ const DEFAULT_STATUS = "pending"
 const Input = document.getElementById("todo-input");
 const ListEL = document.getElementById("todo-list");
 const clearBtn = document.querySelector(".clear-btn");
-clearBtn.style.display='none'
 
 Input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
@@ -17,6 +16,7 @@ async function fetchTodos() {
         const resp = await fetch(`${API_URL}/todo`)
         const todos = await resp.json()
         ListEL.innerHTML = ''
+        clearBtn.style.display = (Array.isArray(todos) && todos.length > 0) ? 'inline-block' : 'none'
         todos.forEach(todo=>{
                 const li = createTodo(todo)
                 ListEL.appendChild(li)
@@ -80,5 +80,26 @@ function createTodo(todo) {
     li.appendChild(delBtn);
     return li;
 
+}
+async function deleteAll() {
+    if (!confirm("确定要清空所有任务吗？")) return
+    clearBtn.disabled = true
+    try {
+        const resp = await fetch(`${API_URL}/todos`, {
+            method: "DELETE",
+            headers: {"Content-Type": "application/json"},
+        })
+        const data = await resp.json().catch(() => ({}))
+        if (resp.ok) {
+            await fetchTodos()
+        } else {
+            alert(data?.error ? `删除失败：${data.error}` : "删除失败")
+        }
+    } catch (err) {
+        console.log(err)
+        alert("删除失败：网络或服务器错误")
+    } finally {
+        clearBtn.disabled = false
+    }
 }
 fetchTodos()

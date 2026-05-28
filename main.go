@@ -90,14 +90,22 @@ func main() {
 		//删除
 		V1Group.DELETE("/todo/:id", func(c *gin.Context) {
 			id := c.Param("id")
-			if err = db.Where("id=?", id).Delete(Todo{}).Error; err != nil {
+			if err = db.Where("id=?", id).Delete(&Todo{}).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"error": err})
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"status": "deleted"})
 			}
 		})
+		// 一键删除：删除全部
+		V1Group.DELETE("/todos", func(c *gin.Context) {
+			if err = db.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&Todo{}).Error; err != nil {
+				c.JSON(http.StatusOK, gin.H{"error": err})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"status": "deleted_all"})
+		})
 	}
-	r.Run(":8080")
+	r.Run(":8081")
 
 }
